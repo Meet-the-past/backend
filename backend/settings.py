@@ -45,7 +45,6 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'todos',
 ]
 
 MIDDLEWARE = [
@@ -94,6 +93,7 @@ DATABASES = {
         'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
+# 향후 PASSWORD , HOST명은 환경변수 파일로 따로 빼야할 것 같음
 
 
 # Password validation

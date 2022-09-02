@@ -2,13 +2,13 @@ import uuid
 
 from django.db import models
 
-from docker.backend.users.models import user
+from users.models import user
 
 
 class Images(models.Model):  ##S
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)# PK
 
-    origin_url = models.ImageField(upload_to='usr')
+    origin_url = models.CharField(max_length=200)
     converted_url = models.CharField(max_length=200)
     user_id = models.ForeignKey(user, on_delete=models.CASCADE, db_column='user_id')
     status = models.TextChoices('status', 'a b c') # Status 입력
@@ -23,4 +23,3 @@ class Images(models.Model):  ##S
 
     class Meta:
         db_table = 'image'
-

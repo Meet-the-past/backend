@@ -50,9 +50,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'images',
-    'users',
     'rest_framework',
-    'storages'
+    'storages',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.postgresql'),
         'NAME': os.environ.get('SQL_DATABASE', os.path.join(BASE_DIR, 'db.sqlite3')),
         'USER': os.environ.get('SQL_USER', 'eg_user'),
         'PASSWORD': os.environ.get('SQL_PASSWORD', 'eg_pw'),

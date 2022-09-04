@@ -10,8 +10,8 @@ import uuid
 from backend.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
-from images.models import images
-from PIL import Image
+from .models import *
+
 
 # from uilts import upload_file
 # from datetime import datetime
@@ -54,8 +54,11 @@ def get_img_url(request):
                             #f'{image_url}'
                             #user_id = 1,##이부분 나중에 바꿔야 함
                             #status
-        b = images(origin_url = image_url)
-        b.save()                  
+
+        image = images()
+        image.origin_url = image_url
+        image.save()
+            
         
         print("db")
         return Response(True)

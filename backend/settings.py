@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     # 'images',
     'users',
     'rest_framework',
-    'drf-yasg'
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [

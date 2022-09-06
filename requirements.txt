@@ -21,7 +21,7 @@ markdown==3.4.1
 
 
 # 스웨거 관련 문서
-drf-yasg
+drf_yasg
 
 # S3 Bucket
 boto3

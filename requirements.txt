@@ -10,6 +10,9 @@ pytz==2021.1
 sqlparse==0.4.1
 toml==0.10.2
 
+# 스웨거 관련 문서
+drf-yasg
+
 # S3 Bucket
 boto3
 django-storages

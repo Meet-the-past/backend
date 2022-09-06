@@ -20,6 +20,9 @@ django-rest-auth==0.9.5
 markdown==3.4.1
 
 
+# 스웨거 관련 문서
+drf-yasg
+
 # S3 Bucket
 boto3
 django-storages

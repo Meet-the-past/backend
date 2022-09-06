@@ -31,11 +31,6 @@ def get_img_url(request):
     try:
         
         image = request.FILES['origin_url']
-        print("image insert")
-        # fileupload=FileUpload(
-        #     imgfile=image,
-        # )
-        # fileupload.save()
         s3_client = boto3.client(
             's3',
             aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -47,20 +42,16 @@ def get_img_url(request):
         image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
                     image_uuid + "." + image_type
         image_url = image_url.replace(" ", "/")
-        print("url")
         print(image_url)
-        # images.objects.create(origin_url = image_url,
-        # converted_url="ddd")
+        images.objects.create(origin_url = image_url,status = 'SUCCESS')
                             #f'{image_url}'
                             #user_id = 1,##이부분 나중에 바꿔야 함
                             #status
 
-        image = images()
-        image.origin_url = image_url
-        image.save()
+        # image = images()
+        # image.origin_url = image_url
+        # image.save()
             
-        
-        print("db")
         return Response(True)
 
     except Exception as ex:
@@ -68,3 +59,34 @@ def get_img_url(request):
         print("예외가 발생")
         return Response(False)
 
+@api_view(['DELETE'])
+def delet_images(request,Id):
+    try:
+        update = images.objects.get(id=Id)
+        update.is_deleted = True
+        update.save()
+        return Response(True)
+
+    except Exception as ex:
+        print(ex)
+        print("예외가 발생")
+        return Response(False)
+
+@api_view(['POST']) #추후 post로 바꿀 예정
+def get_history(request):
+    try:
+        
+        #토큰으로 받은 아이디
+        image_id = request.POST['Id']#임시로 
+        
+        #update = images.objects.get(id=Id)
+        # update.save()
+        a="D"#Account.objects.filter(id= Id).only("origin_url", "converted_url")
+        print(a)
+
+        return Response(True)
+
+    except Exception as ex:
+        print(ex)
+        print("예외가 발생")
+        return Response(False)

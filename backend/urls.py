@@ -19,5 +19,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/images', include('images.urls'), name='images'),#s
     path('api/users', include('users.urls'), name='users')
+   
 
 ]

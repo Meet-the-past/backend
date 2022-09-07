@@ -11,20 +11,8 @@ from backend.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from .models import *
-
-
-# from uilts import upload_file
-# from datetime import datetime
-
-# class Images(APIView):  ##S
-#     def post(self, request, format=None):
-#         serializers = PhotoSerializer(data=request.data)
-#         if serializers.is_valid():
-#             serializers.save()
-#             return Response(serializers.data, status.HTTP_201_CREATED)
-#         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+from django.core import serializers
+import json
 
 @api_view(['POST'])
 def get_img_url(request):
@@ -72,21 +60,38 @@ def delet_images(request,Id):
         print("예외가 발생")
         return Response(False)
 
-@api_view(['POST']) #추후 post로 바꿀 예정
+###test코드
+@api_view(['POST'])
 def get_history(request):
     try:
         
         #토큰으로 받은 아이디
-        image_id = request.POST['Id']#임시로 
+        user_id = request.POST['user_id']#임시로 
+
+        image=images.objects.filter(status = "SUCCESS")
+        serializer=imagesSerializer(image, many=True)
         
-        #update = images.objects.get(id=Id)
-        # update.save()
-        a="D"#Account.objects.filter(id= Id).only("origin_url", "converted_url")
-        print(a)
-
-        return Response(True)
-
+        return Response(serializer.data)
+       
     except Exception as ex:
         print(ex)
         print("예외가 발생")
         return Response(False)
+
+
+#실제 코드 
+# @api_view(['GET'])
+# def get_history(request):
+#     try:
+        
+#         #토큰으로 받은 아이디
+       
+
+#         image=images.objects.filter(user_id = "token으로 받은 값")
+#         serializer=imagesSerializer(image, many=True)
+#         return Response(serializer.data)
+       
+#     except Exception as ex:
+#         print(ex)
+#         print("예외가 발생")
+#         return Response(False)

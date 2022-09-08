@@ -68,7 +68,7 @@ def get_history(request):
         #토큰으로 받은 아이디
         user_id = request.POST['user_id']#임시로 
 
-        image=images.objects.filter(status = "SUCCESS")
+        image=images.objects.filter(status = "SUCCESS",is_deleted=False)
         serializer=imagesSerializer(image, many=True)
         
         return Response(serializer.data)
@@ -95,3 +95,4 @@ def get_history(request):
 #         print(ex)
 #         print("예외가 발생")
 #         return Response(False)
+

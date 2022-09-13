@@ -18,6 +18,14 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('api/images', include('images.urls'), name='images'),#s
-    path('api/users', include('users.urls'), name='users')
+    path('api/users/', include('users.urls'), name='users'),
 
+    path('api/rest-auth/registration/', include("rest_auth.registration.urls")),
+    path('api/rest-auth/', include("rest_auth.urls")),
+    path('api-auth/', include('rest_framework.urls')),
+
+    # path(r'^rest-auth/', include('rest_auth.urls')),
+    # path(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+    # path(r'^api/users/', include('allauth.urls')),
 ]
+

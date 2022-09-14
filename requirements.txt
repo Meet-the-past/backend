@@ -14,3 +14,10 @@ toml==0.10.2
 boto3
 django-storages
 pillow
+PyAMQP
+django_celery_beat
+django_celery_results
+celery
+redis
+Pillow>=7.1.2
+django-redis

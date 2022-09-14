@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
-from images import views
+from . import views
 
 urlpatterns = [
-    path('', views.get_img_url, name='images')
+    path('', views.get_task_id, name='images')
 ]

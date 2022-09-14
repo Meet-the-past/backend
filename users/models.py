@@ -7,7 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from .managers import CustomUserManager
 
 
-class user(AbstractUser):
+class user(models.Model): # 상속 클래스 내용으로 인한 error
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)  # PK
     name = models.CharField(max_length=200, null=False)
     email = models.EmailField(_('email address'), unique=True)

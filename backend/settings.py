@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import os,json
+import os, json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 secret_file = os.path.join(BASE_DIR, 'secrets.json')
 with open(secret_file) as f:
     secrets = json.loads(f.read())
+
+
 def get_secret(setting):
     """비밀 변수를 가져오거나 명시적 예외를 반환한다."""
     try:
@@ -39,7 +41,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     'images',
     'rest_framework',
     'storages',
+    'django_celery_beat',
+    'django_celery_results'
     'users'
 ]
 
@@ -85,8 +88,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -101,9 +102,6 @@ DATABASES = {
         'PORT': os.environ.get('SQL_PORT', '5432'),
     }
 }
-
-
-
 
 # 향후 PASSWORD , HOST명은 환경변수 파일로 따로 빼야할 것 같음
 
@@ -126,7 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -137,7 +134,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
@@ -152,3 +148,33 @@ AWS_ACCESS_KEY_ID = get_secret("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = get_secret("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = get_secret("AWS_REGION")
 AWS_STORAGE_BUCKET_NAME = get_secret("AWS_STORAGE_BUCKET_NAME")
+
+CELERY_BROKER_URL = 'amqp://rabbitmq:5672'
+CELERY_ACCEPT_CONTENT = ['pickle', 'json']
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Seoul'
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(1e10)
+
+CACHES = {
+    'default': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        'LOCATION': 'redis://redis:6379',
+    }
+}
+
+SCHEDULE_MINUTE = 60
+SCHEDULE_HOUR = 60 * SCHEDULE_MINUTE
+SCHEDULE_DAY = 24 * SCHEDULE_HOUR
+SCHEDULE_WEEK = 7 * SCHEDULE_DAY
+SCHEDULE_MONTH = 30 * SCHEDULE_DAY
+
+CELERY_BEAT_SCHEDULE = {
+    'add': {
+        'task': 'images.tasks.add',
+        'schedule': 5 * SCHEDULE_MINUTE,
+        # 'schedule': 2.0,
+        # 'args': (4, 4)
+    }
+}

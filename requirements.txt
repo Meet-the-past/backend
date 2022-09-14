@@ -24,3 +24,5 @@ markdown==3.4.1
 boto3
 django-storages
 pillow
+
+django-environ

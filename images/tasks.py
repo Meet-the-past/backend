@@ -23,10 +23,10 @@ def add(x, y):
 #         return {"ai_results": 0, "image_url": 0}
 #     return {"ai_results": result["ai_results"], "image_url": image_url}
 
-from .views import get_img_url
+#from .views import get_img_url
 @app.task
 def ai_task(request):
-    image_url = get_img_url(request)
+    image_url = "향후 함수 추가 필요"
     # result = get_ai_result(image_url)
     sleep(10)
     #ai 처리

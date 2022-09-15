@@ -51,11 +51,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'images',
+    'users',
     'rest_framework',
     'storages',
     'django_celery_beat',
     'django_celery_results'
-    'users'
 ]
 
 MIDDLEWARE = [

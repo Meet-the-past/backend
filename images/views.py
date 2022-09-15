@@ -16,6 +16,11 @@ from celery.result import AsyncResult
 
 from users.models import user
 
+        
+from .models import *
+from django.core import serializers
+import json
+
 class Images(APIView):
     def post(self, request, format=None):
         serializers = PhotoSerializer(data=request.data)
@@ -23,70 +28,66 @@ class Images(APIView):
             serializers.save()
             return Response(serializers.data, status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+'''
+//향후 유틸로 분리하여 코드 활용하기 (특정 이미지를 받으면 버킷에 저장)
+-> 매개변수로 파일이 저장된 위치를 받고 return으로 해당 이미지가 저장된 url
+'''
+# @api_view(['POST']) 
+# def get_img_url(request):
+#     try:
         
-        
-from .models import *
-from django.core import serializers
-import json
+#         image = request.FILES['origin_url']
+#         s3_client = boto3.client(
+#             's3',
+#             aws_access_key_id=AWS_ACCESS_KEY_ID,
+#             aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+#         )
+#         image_type = "jpg" or "png"
+#         image_uuid = str(uuid.uuid4())
+#         s3_client.put_object(Body=image, Bucket='meet-the-past', Key=image_uuid + "." + image_type)
+#         image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
+#                     image_uuid + "." + image_type
+#         image_url = image_url.replace(" ", "/")
+#         print(image_url)
+#         Images.objects.create(origin_url = image_url,status = 'SUCCESS')
+#                             #f'{image_url}'
+#                             #user_id = 1,##이부분 나중에 바꿔야 함
+#                             #status
 
-@api_view(['POST'])
-def get_img_url(request):
-    try:
-        
-        image = request.FILES['origin_url']
-        s3_client = boto3.client(
-            's3',
-            aws_access_key_id=AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-        )
-        image_type = "jpg" or "png"
-        image_uuid = str(uuid.uuid4())
-        s3_client.put_object(Body=image, Bucket='meet-the-past', Key=image_uuid + "." + image_type)
-        image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
-                    image_uuid + "." + image_type
-        image_url = image_url.replace(" ", "/")
-        print(image_url)
-        images.objects.create(origin_url = image_url,status = 'SUCCESS')
-                            #f'{image_url}'
-                            #user_id = 1,##이부분 나중에 바꿔야 함
-                            #status
-
-        # image = images()
-        # image.origin_url = image_url
-        # image.save()
+#         # image = images()
+#         # image.origin_url = image_url
+#         # image.save()
             
-        return Response(True)
+#         return Response(True)
 
-    except Exception as ex:
-        print(ex)
-        print("예외가 발생")
-        return Response(False)
+#     except Exception as ex:
+#         print(ex)
+#         print("예외가 발생")
+#         return Response(False)
 
+
+'''
+ @ fuction delete_images - history에 저장된 이미지 삭제
+ @ param : imageId 
+ 
+'''
 @api_view(['DELETE'])
-def delet_images(request,Id):
+def delete_images(request,Id):
     try:
         update = images.objects.get(id=Id)
         update.is_deleted = True
         update.save()
         return Response(True)
+    except Exception as ex:
+        print(ex)
+        return Response(False)
 
-# url 받는 함수(sleep(50)) -> celery, 나중에 함수만 바꾸기.
 
-# @api_view(['POST'])
-def get_img_url(image):
-    s3_client = boto3.client(
-        's3',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-    )
-    image_type = "jpg"
-    image_uuid = str(uuid.uuid4())
-    s3_client.put_object(Body=image, Bucket='mpt-bucket', Key=image_uuid + "." + image_type)
-    image_url = "http://mpt-bucket.s3.ap-northeast-2.amazonaws.com/" + \
-                image_uuid + "." + image_type
-    image_url = image_url.replace(" ", "/")
-    return image_url
-
+'''
+ @ fuction get_task_id - 사용자가 이미지를 업로드하면 taskID반환
+ @ param : FormData("filename") 
+ @ ai_task.delay 함수에서 실제 AI코드 돌아감
+'''
 from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
@@ -100,6 +101,11 @@ def get_task_id(request):
     task = ai_task.delay(img_instance)
     return JsonResponse({"task_id": task.id})
 
+'''
+ @ fuction get_task_result - taskId값을 받아 AI결과의 처리여부 확인 및 결과 url 반환
+ @ param : taskId 
+ @ 추가해야할 부분 : userId의 경우 토큰을 통해 식별하기때문에 유저확인을 위한 코드부분은 수정해야합니다.
+'''
 @api_view(['GET'])
 def get_task_result(request, user_id, task_id):
     task = AsyncResult(task_id)
@@ -129,7 +135,12 @@ def get_task_result(request, user_id, task_id):
         print("예외가 발생")
         return Response(False)
 
-###test코드
+'''
+ @ fuction get_history - 사용자가 업로드한 이미지들을 반환
+ @ ai_task.delay 함수에서 실제 AI코드 돌아감
+ @향후 로그인 기능이 구현되면 헤더에서 받은 토큰을 이용해서 userId값 받을 것(실제 코드 부분 참고)
+
+'''
 @api_view(['POST'])
 def get_history(request):
     try:
@@ -140,7 +151,7 @@ def get_history(request):
         image=images.objects.filter(status = "SUCCESS",is_deleted=False)
         serializer=imagesSerializer(image, many=True)
         
-        return Response(serializer.data)
+        return JsonResponse({"data":serializer.data})
        
     except Exception as ex:
         print(ex)
@@ -155,8 +166,7 @@ def get_history(request):
         
 #         #토큰으로 받은 아이디
        
-
-#         image=images.objects.filter(user_id = "token으로 받은 값")
+#         image=images.objects.filter(user_id = "token으로 받은 값" ,is_deleted=False)
 #         serializer=imagesSerializer(image, many=True)
 #         return Response(serializer.data)
        

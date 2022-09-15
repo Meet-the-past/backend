@@ -21,7 +21,13 @@ from .models import *
 from django.core import serializers
 import json
 
-
+class Images(APIView):
+    def post(self, request, format=None):
+        serializers = PhotoSerializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status.HTTP_201_CREATED)
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 '''
 //향후 유틸로 분리하여 코드 활용하기 (특정 이미지를 받으면 버킷에 저장)
 -> 매개변수로 파일이 저장된 위치를 받고 return으로 해당 이미지가 저장된 url
@@ -43,7 +49,7 @@ import json
 #                     image_uuid + "." + image_type
 #         image_url = image_url.replace(" ", "/")
 #         print(image_url)
-#         images.objects.create(origin_url = image_url,status = 'SUCCESS')
+#         Images.objects.create(origin_url = image_url,status = 'SUCCESS')
 #                             #f'{image_url}'
 #                             #user_id = 1,##이부분 나중에 바꿔야 함
 #                             #status

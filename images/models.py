@@ -5,7 +5,7 @@ from django.db import models
 from users.models import user
 from django.utils import timezone
 
-class images(models.Model):  ##S
+class Images(models.Model):  ##S
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)# PK 
     origin_url = models.CharField(max_length=200)
     converted_url = models.CharField(max_length=200,null=True)
@@ -35,4 +35,4 @@ class images(models.Model):  ##S
         return self.origin_url
 
     class Meta:
-        db_table = 'images'
+        db_table = 'image'

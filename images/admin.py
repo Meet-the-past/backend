@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from .models import images
+from .models import Images
 
 
-@admin.register(images)
+@admin.register(Images)
 class ImagesAdmin(admin.ModelAdmin):
     list_display = ['id', 'origin_url', 'converted_url',  'is_deleted',
                     'created_at', 'updated_at']#'user_id', 'status',

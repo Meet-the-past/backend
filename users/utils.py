@@ -97,9 +97,9 @@ def user_find_by_email(email):
     return user.objects.filter(email=email)
 
 
-def user_create_client(name, email, password, alias):
+def user_create_client(name, email, password):
     hash_password, salt = user_hash_password(password)
-    return user.objects.create(name=name, alias=alias, password=hash_password, salt=salt, email=email)
+    return user.objects.create(name=name, password=hash_password, salt=salt, email=email)
 
 
 def user_comppassword(password, user_data):

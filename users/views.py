@@ -10,26 +10,36 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from datetime import datetime, timedelta
 from .models import user
-from .serializers import UserSerializer, CustomRegisterSerializer
+from .serializers import UserSerializer, CustomRegisterSerializer, UserSignupResponse
 
 # 누구나 접근 가능 (회원가입 , 아이디 중복시 Error 반환하도록 설계 필요)
 from .utils import user_find_by_name, user_comppassword, user_generate_access_token, user_generate_refresh_token, \
-    user_find_by_email, UserDuplicateCheck, user_token_to_data, user_refresh_to_access
+    user_find_by_email, UserDuplicateCheck, user_token_to_data, user_refresh_to_access, user_create_client
 
 
-@permission_classes([AllowAny])
-class create(generics.GenericAPIView):
-    serializer_class = CustomRegisterSerializer
+# @permission_classes([AllowAny])
+# class create(generics.GenericAPIView):
+#     serializer_class = CustomRegisterSerializer
+#
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         if not serializer.is_valid(raise_exception=True):
+#             return Response({"message": "Request Body Error."}, status=status.HTTP_409_CONFLICT)
+#         serializer.is_valid(raise_exception=True)
+#
+#         user = serializer.save()  # request 필요 -> 오류 발생 //
+#         return HttpResponse(status=200)
+#
+#Singup
+@api_view(['POST'])
+def user_sign_up(request):
+    name = request.data['name']
+    password = request.data['password']
+    email = request.data['email']
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid(raise_exception=True):
-            return Response({"message": "Request Body Error."}, status=status.HTTP_409_CONFLICT)
-        serializer.is_valid(raise_exception=True)
-
-        user = serializer.save()  # request 필요 -> 오류 발생 //
-        return HttpResponse(status=200)
-
+    new_user = user_create_client(name, email, password)
+    data = UserSignupResponse(new_user, many=False).data
+    return Response(data, status=201)
 
 # Login
 @api_view(['POST'])

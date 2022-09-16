@@ -37,6 +37,10 @@ class CustomRegisterSerializer(serializers.ModelSerializer):
 
         return data_dict
 
+class UserSignupResponse(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = ['name']
 
 
 # 로그인

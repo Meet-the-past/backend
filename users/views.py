@@ -66,3 +66,17 @@ def user_is_duplicate(request):
 
 
 
+# refreshtoken 재발급
+def user_reissuance_access_token(request):
+    token = request.headers.get('Authorization', None)
+    payload = user_token_to_data(token)
+    if payload:
+        # new access_token 반환
+        if payload.get('type') == 'refresh_token':
+            access_token = user_refresh_to_access(token)
+            return JsonResponse({"access_token": access_token,
+                                 "expiredTime": datetime.utcnow() + timedelta(minutes=30)}, status=200)
+        else:
+            return JsonResponse({"message": "Not refresh_token"}, status=401)
+    else:
+        return JsonResponse({"message": payload}, status=401)

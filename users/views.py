@@ -14,7 +14,7 @@ from .serializers import UserSerializer, CustomRegisterSerializer
 
 # 누구나 접근 가능 (회원가입 , 아이디 중복시 Error 반환하도록 설계 필요)
 from .utils import user_find_by_name, user_comppassword, user_generate_access_token, user_generate_refresh_token, \
-    user_find_by_email
+    user_find_by_email, UserDuplicateCheck, user_token_to_data, user_refresh_to_access
 
 
 @permission_classes([AllowAny])
@@ -52,3 +52,17 @@ def login(request):
             "email": user_data.email}
 
     return JsonResponse({"result": data}, status=200)
+
+
+# ID duplication check
+def user_is_duplicate(request):
+    email = request.GET.get('email')
+
+    emailValidation=UserDuplicateCheck().email(email)
+
+    if(emailValidation):
+        return JsonResponse({"message": "Invalid value"}, status=401)
+    return JsonResponse({"result": emailValidation}, status=200)
+
+
+

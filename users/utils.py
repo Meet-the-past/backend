@@ -21,9 +21,9 @@ def user_refresh_to_access(refresh_token):
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=ALGORITHM)
         access_token = jwt.encode(
-            {'id': payload.get('id'), 'name': payload.get('name'), 'alias': payload.get('alias'),
+            {'id': payload.get('id'),
              'email': payload.get('email'), 'type': "access_token",
-             'exp': datetime.utcnow() + timedelta(minutes=5)}, SECRET_KEY, ALGORITHM).decode('utf-8')
+             }, SECRET_KEY, ALGORITHM).decode('utf-8')
     except jwt.exceptions.ExpiredSignatureError or jwt.exceptions.DecodeError:
         return False
     return access_token

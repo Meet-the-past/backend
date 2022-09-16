@@ -20,10 +20,11 @@ urlpatterns = [
     path('api/v1/images', include('images.urls'), name='images'),#s
     path('api/v1/users', include('users.urls'), name='users'),
     # path('api/images', include('images.urls'), name='images'),#s
-    path('api/v1/users/', include('users.urls'), name='users'),
 
     path('api/rest-auth/registration/', include("rest_auth.registration.urls")),
     path('api/rest-auth/', include("rest_auth.urls")),
     path('api-auth/', include('rest_framework.urls')),
+
+
 
 ]

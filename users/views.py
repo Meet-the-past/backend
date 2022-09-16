@@ -32,6 +32,7 @@ class create(generics.GenericAPIView):
 
 
 # Login
+@api_view(['POST'])
 def login(request):
     input_email = request.data['email']
     input_password = request.data['password']
@@ -55,21 +56,23 @@ def login(request):
 
 
 # ID duplication check
+@api_view(['POST'])
 def user_is_duplicate(request):
     email = request.GET.get('email')
 
-    emailValidation=UserDuplicateCheck().email(email)
+    emailValidation = UserDuplicateCheck().email(email)
 
-    if(emailValidation):
+    if (emailValidation):
         return JsonResponse({"message": "Invalid value"}, status=401)
     return JsonResponse({"result": emailValidation}, status=200)
 
 
-
 # refreshtoken 재발급
+@api_view(['POST'])
 def user_reissuance_access_token(request):
     token = request.headers.get('Authorization', None)
     payload = user_token_to_data(token)
+
     if payload:
         # new access_token 반환
         if payload.get('type') == 'refresh_token':

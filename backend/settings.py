@@ -43,7 +43,14 @@ SECRET_KEY = get_secret("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '*'
+  
+]
+
+CORS_ORIGIN_WHITELIST = ['http://localhost:3000','http://localhost:80'
+
+]
 
 # Application definition
 
@@ -62,6 +69,7 @@ INSTALLED_APPS = [
 
     #django-rest-auth
     'rest_framework',
+     'corsheaders', #CorsError
     'storages',
     'django_celery_beat',
     'django_celery_results',
@@ -74,7 +82,10 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    
 ]
+
 
 
 MIDDLEWARE = [
@@ -85,6 +96,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware' #CorsError
 ]
 
 ROOT_URLCONF = 'backend.urls'

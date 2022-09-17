@@ -44,8 +44,8 @@ def user_generate_refresh_token(user_data):
 # Password Hashing
 def user_hash_password(password):
     password = str(password).encode('utf-8')
-    salt = bcrypt.gensalt().tobytes()
-    hash_password = bcrypt.hashpw(password, salt.tobytes())
+    salt = bcrypt.gensalt()
+    hash_password = bcrypt.hashpw(password, salt)
     return hash_password, salt
 
 

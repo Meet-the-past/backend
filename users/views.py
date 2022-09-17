@@ -74,8 +74,8 @@ def user_is_duplicate(request):
     emailValidation = UserDuplicateCheck().email(email)
 
     if emailValidation:
-        return JsonResponse({"message": "Duplicated"}, status=401)
-    return JsonResponse({"result": "Use it"}, status=200)
+        return JsonResponse({"message": "Duplicated email"}, status=401)
+    return JsonResponse({"result": "New email"}, status=200)
 
 
 # refreshtoken 재발급

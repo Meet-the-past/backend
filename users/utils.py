@@ -44,7 +44,7 @@ def user_generate_refresh_token(user_data):
 # Password Hashing
 def user_hash_password(password):
     password = str(password).encode('utf-8')
-    salt = bcrypt.gensalt()
+    salt = bcrypt.gensalt().tobytes()
     hash_password = bcrypt.hashpw(password, salt.tobytes())
     return hash_password, salt
 
@@ -59,8 +59,8 @@ class UserDuplicateCheck:
     @staticmethod
     def email(email):
         if user_find_by_email(email):
-            return False
-        return True
+            return True
+        return False
 
     @staticmethod
     def name(name):

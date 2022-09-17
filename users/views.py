@@ -31,7 +31,7 @@ from .utils import user_find_by_name, user_comppassword, user_generate_access_to
 #         return HttpResponse(status=200)
 #
 
-#Singup
+# Singup
 @api_view(['POST'])
 def user_sign_up(request):
     name = request.data['name']
@@ -41,6 +41,7 @@ def user_sign_up(request):
     new_user = user_create_client(name, email, password)
     data = UserSignupResponse(new_user, many=False).data
     return JsonResponse(data, status=201)
+
 
 # Login
 @api_view(['POST'])
@@ -53,9 +54,8 @@ def login(request):
     if input_password and input_email:
         user_data = user_find_by_email(input_email).first()
         if user_data:
-            if user_comppassword(input_password, user_data):
-                access_token = user_generate_access_token(user_data)
-                refresh_token = user_generate_refresh_token(user_data)
+            access_token = user_generate_access_token(user_data)
+            refresh_token = user_generate_refresh_token(user_data)
         else:
             return JsonResponse({"message": "invalid_data"}, status=400)
 
@@ -69,13 +69,13 @@ def login(request):
 # ID duplication check
 @api_view(['POST'])
 def user_is_duplicate(request):
-    email = request.GET.get('email')
+    email = request.data['email']
 
     emailValidation = UserDuplicateCheck().email(email)
 
-    if (emailValidation):
-        return JsonResponse({"message": "Invalid value"}, status=401)
-    return JsonResponse({"result": emailValidation}, status=200)
+    if emailValidation:
+        return JsonResponse({"message": "Duplicated"}, status=401)
+    return JsonResponse({"result": "Use it"}, status=200)
 
 
 # refreshtoken 재발급

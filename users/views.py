@@ -40,7 +40,7 @@ def user_sign_up(request):
 
     new_user = user_create_client(name, email, password)
     data = UserSignupResponse(new_user, many=False).data
-    return Response(data, status=201)
+    return JsonResponse(data, status=201)
 
 # Login
 @api_view(['POST'])

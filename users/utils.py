@@ -31,19 +31,21 @@ def user_refresh_to_access(refresh_token):
 
 def user_generate_access_token(user_data):
     return jwt.encode(
-        {'id': str(user_data.id), 'type': 'access_token','exp': datetime.utcnow() + timedelta(minutes=30)}, SECRET_KEY, ALGORITHM).decode('utf-8')
+        {'id': str(user_data.id), 'type': 'access_token', 'exp': datetime.utcnow() + timedelta(minutes=30)}, SECRET_KEY,
+        ALGORITHM).decode('utf-8')
 
 
 def user_generate_refresh_token(user_data):
     return jwt.encode(
-        {'id': str(user_data.id), 'type': "refresh_token",'exp': datetime.utcnow() + timedelta(days=7)},SECRET_KEY, ALGORITHM).decode('utf-8')
+        {'id': str(user_data.id), 'type': "refresh_token", 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY,
+        ALGORITHM).decode('utf-8')
 
 
 # Password Hashing
 def user_hash_password(password):
     password = str(password).encode('utf-8')
     salt = bcrypt.gensalt()
-    hash_password = bcrypt.hashpw(password, salt)
+    hash_password = bcrypt.hashpw(password, salt.tobytes())
     return hash_password, salt
 
 
@@ -104,5 +106,5 @@ def user_create_client(name, email, password):
 
 def user_comppassword(password, user_data):
     password = str(password).encode('utf-8')
-    hash_password = bcrypt.hashpw(password, user_data.salt)
+    hash_password = bcrypt.hashpw(password, user_data.salt.tobytes())
     return hash_password == user_data.password

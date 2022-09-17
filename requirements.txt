@@ -31,6 +31,6 @@ celery
 redis
 Pillow>=7.1.2
 django-redis
-bcrypt==3.2.2
+bcrypt
 
 django-environ

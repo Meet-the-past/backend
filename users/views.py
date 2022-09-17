@@ -59,7 +59,7 @@ def login(request):
         else:
             return JsonResponse({"message": "invalid_data"}, status=400)
 
-    data = {"access_token": access_token, "refresh_token": refresh_token,
+    data = {"accessToken": access_token, "refreshToken": refresh_token,
             "expiredTime": datetime.utcnow() + timedelta(minutes=30),
             "email": user_data.email}
 

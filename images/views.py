@@ -16,10 +16,10 @@ from celery.result import AsyncResult
 
 from users.models import user
 
-        
 from .models import *
 from django.core import serializers
 import json
+
 
 class Images(APIView):
     def post(self, request, format=None):
@@ -28,6 +28,8 @@ class Images(APIView):
             serializers.save()
             return Response(serializers.data, status.HTTP_201_CREATED)
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 '''
 //향후 유틸로 분리하여 코드 활용하기 (특정 이미지를 받으면 버킷에 저장)
 -> 매개변수로 파일이 저장된 위치를 받고 return으로 해당 이미지가 저장된 url
@@ -35,14 +37,14 @@ class Images(APIView):
 # @api_view(['POST']) 
 # def get_img_url(request):
 #     try:
-        
+
 #         image = request.FILES['origin_url']
 #         s3_client = boto3.client(
 #             's3',
 #             aws_access_key_id=AWS_ACCESS_KEY_ID,
 #             aws_secret_access_key=AWS_SECRET_ACCESS_KEY
 #         )
-#         image_type = "jpg" or "png"
+#         image_type = "jpg"
 #         image_uuid = str(uuid.uuid4())
 #         s3_client.put_object(Body=image, Bucket='meet-the-past', Key=image_uuid + "." + image_type)
 #         image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
@@ -57,7 +59,7 @@ class Images(APIView):
 #         # image = images()
 #         # image.origin_url = image_url
 #         # image.save()
-            
+
 #         return Response(True)
 
 #     except Exception as ex:
@@ -71,10 +73,12 @@ class Images(APIView):
  @ param : imageId 
  
 '''
+
+
 @api_view(['DELETE'])
-def delete_images(request,Id):
+def delete_images(request, Id):
     try:
-        update = images.objects.get(id=Id)
+        update = Images.objects.get(id=Id)
         update.is_deleted = True
         update.save()
         return Response(True)
@@ -100,6 +104,7 @@ def get_task_id(request):
     }
     task = ai_task.delay(img_instance)
     return JsonResponse({"task_id": task.id})
+
 
 '''
  @ fuction get_task_result - taskId값을 받아 AI결과의 처리여부 확인 및 결과 url 반환
@@ -135,43 +140,43 @@ def get_task_result(request, user_id, task_id):
         print("예외가 발생")
         return Response(False)
 
+
 '''
  @ fuction get_history - 사용자가 업로드한 이미지들을 반환
  @ ai_task.delay 함수에서 실제 AI코드 돌아감
  @향후 로그인 기능이 구현되면 헤더에서 받은 토큰을 이용해서 userId값 받을 것(실제 코드 부분 참고)
 
 '''
+
+
 @api_view(['POST'])
 def get_history(request):
     try:
-        
-        #토큰으로 받은 아이디
-        user_id = request.POST['user_id']#임시로 
+        # 토큰으로 받은 아이디
+        user_id = request.POST['user_id']  # 임시로
 
-        image=images.objects.filter(status = "SUCCESS",is_deleted=False)
-        serializer=imagesSerializer(image, many=True)
-        
-        return JsonResponse({"data":serializer.data})
-       
+        image = Images.objects.filter(status="SUCCESS", is_deleted=False)
+        serializer = PhotoSerializer(image, many=True)
+
+        return JsonResponse({"data": serializer.data})
+
     except Exception as ex:
         print(ex)
         print("예외가 발생")
         return Response(False)
 
-
-#실제 코드 
+# 실제 코드
 # @api_view(['GET'])
 # def get_history(request):
 #     try:
-        
+
 #         #토큰으로 받은 아이디
-       
+
 #         image=images.objects.filter(user_id = "token으로 받은 값" ,is_deleted=False)
 #         serializer=imagesSerializer(image, many=True)
 #         return Response(serializer.data)
-       
+
 #     except Exception as ex:
 #         print(ex)
 #         print("예외가 발생")
 #         return Response(False)
-

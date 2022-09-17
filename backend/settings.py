@@ -9,10 +9,14 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-import os, json
+
+import os,json
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+from environ import ImproperlyConfigured
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 secret_file = os.path.join(BASE_DIR, 'secrets.json')
@@ -50,13 +54,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+
     'images',
     'users',
+
+    #django-rest-auth
     'rest_framework',
     'storages',
     'django_celery_beat',
-    'django_celery_results'
+    'django_celery_results',
+    # 'rest_framework_simplejwt.token_blacklist',
+    # 'rest_framework.authtoken',
+    # 'dj_rest_auth',
+    # 'dj_rest_auth.registration',
+
+    #django-allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -129,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

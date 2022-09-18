@@ -34,3 +34,19 @@ django-redis
 bcrypt
 
 django-environ
+
+#AI
+
+torch
+torchvision
+scikit-image
+easydict
+PyYAML
+dominate>=2.3.1
+dill
+tensorboardX
+scipy
+opencv-python
+einops
+PySimpleGUI
+matplotlib

@@ -1,5 +1,5 @@
 # pull official base image
-FROM python:3.8.3-alpine
+FROM --platform=linux/x86_64 python:3.7
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -15,9 +15,22 @@ ENV DJANGO_CORS_ORIGIN_WHITELIST $DJANGO_CORS_ORIGIN_WHITELIST
 WORKDIR /backend
 COPY requirements.txt /backend/
 
-RUN apk add postgresql-dev libressl-dev libffi-dev gcc musl-dev gcc python3-dev musl-dev zlib-dev jpeg-dev #--(5.2)
+# RUN apt-get update
+# RUN apt-get install ffmpeg libsm6 libxext6  -y
+
+
+# RUN apt add postgresql-dev libressl-dev libffi-dev gcc musl-dev gcc python3-dev musl-dev zlib-dev jpeg-dev #--(5.2)
+
 
 RUN pip install --upgrade pip
+
+#AI
+RUN apt-get update
+RUN apt-get install ffmpeg libsm6 libxext6  -y
 RUN pip install -r requirements.txt
+RUN pip install cmake
+RUN pip3 install dlib
+
+
 
 COPY . /backend/

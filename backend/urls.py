@@ -24,6 +24,12 @@ from drf_yasg.views import get_schema_view
 
 router = routers.DefaultRouter()
 
+
+schema_view_patterns = [
+    path('', include('users.urls'), name='users_api'),
+    # path(r'^v1/', include('movie.urls', namespace='movie_api')),
+]
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Meet The Past API",  # 타이틀
@@ -32,16 +38,25 @@ schema_view = get_schema_view(
     ),
     validators=['flex'],
     public=True,
-    permission_classes=(AllowAny,)
+    permission_classes=(AllowAny,),
+    patterns=schema_view_patterns,
 )
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('api/images', include('images.urls'), name='images'),#s
-    path('api/users', include('users.urls'), name='users'),
-    path('api/', include('swagger.urls'), name='api'),
+    path('v1/api/users', include('users.urls'), name='users'),
 
+    # # Auto DRF API docs
+    # path(r'^swagger(?P<format>\.json|\.yaml)/v1$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    # path(r'^swagger/v1/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    # path(r'^redoc/v1/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc-v1'),
 ]
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     # path('api/images', include('images.urls'), name='images'),#s
+#     # path('api/', include('swagger.urls'), name='api'),
+#
+# ]
 
 if settings.DEBUG:
     urlpatterns += [

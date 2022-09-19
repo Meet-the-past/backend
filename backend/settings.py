@@ -67,7 +67,7 @@ INSTALLED_APPS = [
     'users',
      'images',
 
-    #django-rest-auth
+    # 'django-rest-auth',
     'rest_framework',
      'corsheaders', #CorsError
     'storages',

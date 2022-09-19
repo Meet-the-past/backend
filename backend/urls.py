@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from drf_yasg import openapi
 from rest_framework import routers, permissions
+from rest_framework.permissions import AllowAny
 from rest_framework.schemas import get_schema_view
 from drf_yasg.views import get_schema_view
 
@@ -25,15 +26,13 @@ router = routers.DefaultRouter()
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Statchung API",
-        default_version='v1',
-        description="test description",
-        terms_of_service="https://www.google.com/policies/terms/",
-        contact=openapi.Contact(email="contact@snippets.local"),
-        license=openapi.License(name="BSD License"),
+        title="Meet The Past API",  # 타이틀
+        default_version='v1',   # 버전
+        description="AI service for old pics renewer",   # 설명
     ),
+    validators=['flex'],
     public=True,
-    permission_classes=[permissions.AllowAny],
+    permission_classes=(AllowAny,)
 )
 
 urlpatterns = [

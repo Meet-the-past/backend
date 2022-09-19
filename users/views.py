@@ -1,16 +1,7 @@
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
-from django.shortcuts import render
-from django.core.cache import cache
-# Create your views here.
-from django.urls import reverse
-from requests import Response
-from rest_framework import status, generics
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
 from datetime import datetime, timedelta
-from .models import user
-from .serializers import UserSerializer, CustomRegisterSerializer, UserSignupResponse
+from .serializers import UserSignupResponse
 
 # 누구나 접근 가능 (회원가입 , 아이디 중복시 Error 반환하도록 설계 필요)
 from .utils import *

@@ -40,6 +40,12 @@ from drf_yasg.views import get_schema_view
 
 router = routers.DefaultRouter()
 
+
+schema_view_patterns = [
+    path('', include('users.urls'), name='users_api'),
+    # path(r'^v1/', include('movie.urls', namespace='movie_api')),
+]
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Meet The Past API",  # 타이틀
@@ -48,9 +54,9 @@ schema_view = get_schema_view(
     ),
     validators=['flex'],
     public=True,
-    permission_classes=(AllowAny,)
+    permission_classes=(AllowAny,),
+    patterns=schema_view_patterns,
 )
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/images/', include('images.urls'), name='images'),#s
@@ -58,11 +64,19 @@ urlpatterns = [
     # path('api/images', include('images.urls'), name='images'),#s
     path('api/users', include('users.urls'), name='users'),
     path('api/', include('swagger.urls'), name='api'),
+   # 이 부분은 뭔지 몰라서 일단 주석처리 path('v1/api/users', include('users.urls'), name='users'),
 
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view_v1.without_ui(cache_timeout=0), name='schema-json'),
     re_path(r'^swagger/$', schema_view_v1.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^redoc/$', schema_view_v1.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
+
+# urlpatterns = [
+#     path('admin/', admin.site.urls),
+#     # path('api/images', include('images.urls'), name='images'),#s
+#     # path('api/', include('swagger.urls'), name='api'),
+#
+# ]
 
 if settings.DEBUG:
     urlpatterns += [

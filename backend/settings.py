@@ -15,9 +15,6 @@ from datetime import timedelta
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
-from rest_framework.permissions import AllowAny
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from environ import ImproperlyConfigured

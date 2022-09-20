@@ -92,7 +92,7 @@ def delete_images(request, Id):
  @ param : FormData("filename") 
  @ ai_task.delay 함수에서 실제 AI코드 돌아감
 '''
-from .tasks import ai_task
+# from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
     image = Image.open(io.BytesIO(request.FILES.get('filename').read()))

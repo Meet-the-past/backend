@@ -1,9 +1,5 @@
 import uuid
-
-from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
 from .managers import CustomUserManager
 
 
@@ -44,6 +40,6 @@ class user(models.Model): # 상속 클래스 내용으로 인한 error
         Always return False. This is a way of comparing User objects to
         anonymous users.
         """
-        return False    
+        return False
     class Meta:
         db_table = 'user'

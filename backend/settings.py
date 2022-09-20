@@ -14,6 +14,8 @@ import os,json
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from environ import ImproperlyConfigured
 

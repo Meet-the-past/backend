@@ -1,4 +1,8 @@
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from datetime import datetime, timedelta
 from .serializers import UserSignupResponse
@@ -7,27 +11,34 @@ from .serializers import UserSignupResponse
 from .utils import user_generate_access_token, user_generate_refresh_token, \
     user_find_by_email, UserDuplicateCheck, user_token_to_data, user_refresh_to_access, user_create_client
 
-
-# @permission_classes([AllowAny])
-# class create(generics.GenericAPIView):
-#     serializer_class = CustomRegisterSerializer
-#
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         if not serializer.is_valid(raise_exception=True):
-#             return Response({"message": "Request Body Error."}, status=status.HTTP_409_CONFLICT)
-#         serializer.is_valid(raise_exception=True)
-#
-#         user = serializer.save()  # request 필요 -> 오류 발생 //
-#         return HttpResponse(status=200)
-#
-
 # Singup
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''사용자 회원가입''',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'name': openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
+            'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
+            'password': openapi.Schema('사용자 패스워드', type=openapi.TYPE_STRING),
+        },
+        required=['name','email','password']  # 필수값을 지정 할 Schema를 입력해주면 된다.
+        ),
+    responses={
+        201: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'name': openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
+                'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
+                'password': openapi.Schema('사용자 패스워드', type=openapi.TYPE_STRING),
+        }
+    )}
+)
 @api_view(['POST'])
 def user_sign_up(request):
     name = request.data['name']
-    password = request.data['password']
     email = request.data['email']
+    password = request.data['password']
 
     new_user = user_create_client(name, email, password)
     data = UserSignupResponse(new_user, many=False).data
@@ -35,6 +46,28 @@ def user_sign_up(request):
 
 
 # Login
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''사용자 로그인''',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'input_email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
+            'input_password': openapi.Schema('사용자 패스워드', type=openapi.TYPE_STRING),
+        },
+        required=['email','password']  # 필수값을 지정 할 Schema를 입력해주면 된다.
+    ),
+    responses={
+        200: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'accessToken': openapi.Schema('access token', type=openapi.TYPE_STRING),
+                'refreshToken': openapi.Schema('refresh token', type=openapi.TYPE_STRING),
+                'expiredTime': openapi.Schema('expired time', type=openapi.TYPE_NUMBER), # 타입이 맞나...?
+                'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
+            }
+        )}
+)
 @api_view(['POST'])
 def login(request):
     input_email = request.data['email']
@@ -57,11 +90,34 @@ def login(request):
     return JsonResponse({"result": data}, status=200)
 
 
-# ID duplication check
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''ID duplication check''',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
+        },
+        required=['email']  # 필수값을 지정 할 Schema를 입력해주면 된다.
+    ),
+    responses={
+        200: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema('New email', type=openapi.TYPE_STRING),
+            }
+        ),
+        401: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema('Duplicated email', type=openapi.TYPE_STRING),
+            }
+        )
+    }
+)
 @api_view(['POST'])
 def user_is_duplicate(request):
     email = request.data['email']
-
     emailValidation = UserDuplicateCheck().email(email)
 
     if emailValidation:
@@ -69,7 +125,32 @@ def user_is_duplicate(request):
     return JsonResponse({"result": "New email"}, status=200)
 
 
-# refreshtoken 재발급
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''refreshtoken 재발급''',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'token': openapi.Schema('사용자 token', type=openapi.TYPE_STRING),
+        },
+        required=['token']  # 필수값을 지정 할 Schema를 입력해주면 된다.
+    ),
+    responses={
+        200: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'access_token': openapi.Schema('access_token', type=openapi.TYPE_STRING),
+                'expiredTime': openapi.Schema('expiredTime', type=openapi.TYPE_STRING),
+            }
+        ),
+        401: openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'message': openapi.Schema('Not refresh_token', type=openapi.TYPE_STRING),
+            }
+        )
+    }
+)
 @api_view(['POST'])
 def user_reissuance_access_token(request):
     token = request.headers.get('Authorization', None)

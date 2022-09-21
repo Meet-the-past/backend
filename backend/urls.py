@@ -23,8 +23,8 @@ from drf_yasg.views import get_schema_view
 
 router = routers.DefaultRouter()
 schema_url_patterns = [
-    path('', include('users.urls')),
-    path('', include('images.urls')),
+    path('api/v1/users/', include('users.urls')),
+    path('api/v1/images/', include('images.urls')),
 ]
 
 schema_view = get_schema_view(

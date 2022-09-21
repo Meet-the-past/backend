@@ -41,7 +41,7 @@ def ai_task(path, name):
     #     print("잠자는중")
     #     image_url = image_url+1
     ai_process(path,name)
-    after_url = uploadBucket('ai_image/'+path+'/final_output'+name+'.png') #버킷 업로드
+    after_url = uploadBucket('ai_image/'+path+'/final_output/'+name+'.png') #버킷 업로드
     print("결과를 버킷에 업로드합니다.")
     
     try:

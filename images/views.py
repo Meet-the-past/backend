@@ -132,7 +132,7 @@ def get_task_id(request):
  @ 추가해야할 부분 : userId의 경우 토큰을 통해 식별하기때문에 유저확인을 위한 코드부분은 수정해야합니다.
 '''
 @api_view(['GET'])
-def get_task_result(request, user_id, task_id):
+def get_task_result(request, task_id):
     task = AsyncResult(task_id)
     if not task.ready():  # 작업이 완료되지 않았을 경우
         return JsonResponse({"ai_result": "Wait a minute please"})
@@ -140,18 +140,13 @@ def get_task_result(request, user_id, task_id):
 
     #작업이 완료되면(즉 이미지가 생성되었다면) 값을 꺼내오기 (이미지를 지운다거나, 버킷에 올리거나 하는 일은 여기서 해선 안됨.
     # 여기서 해야하는 일은 반복해도 괜찮은 일)
-    ai_results = task.get("ai_results")
-    image_url = task.get("image_url")
-    
-    
-    if image_url == 0:  # ai 결과가 없을 경우
-        return JsonResponse({"ai_result": "false"})
-
-
-    else :
-        return JsonResponse({'image_id': image_url})
-
+    uuidValue = task.get()['uuid']
+    image = images.objects.get(id=uuidValue)
+    serializer = PhotoSerializer2(image)
+    return JsonResponse({"data": serializer.data})
   
+    
+
 
 
 '''

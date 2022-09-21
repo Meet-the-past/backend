@@ -3,5 +3,5 @@ from .models import *
 
 class PhotoSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Images
+        model = images
         fields=('id', 'converted_url')

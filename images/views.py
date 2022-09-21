@@ -1,7 +1,8 @@
+from email.mime import image
 import boto3 as boto3
 from PIL import Image
 from django.core.cache import cache
-from .models import Images
+from .models import images
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
@@ -21,13 +22,13 @@ from django.core import serializers
 import json
 
 
-class Images(APIView):
-    def post(self, request, format=None):
-        serializers = PhotoSerializer(data=request.data)
-        if serializers.is_valid():
-            serializers.save()
-            return Response(serializers.data, status.HTTP_201_CREATED)
-        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+# class Images(APIView):
+#     def post(self, request, format=None):
+#         serializers = PhotoSerializer(data=request.data)
+#         if serializers.is_valid():
+#             serializers.save()
+#             return Response(serializers.data, status.HTTP_201_CREATED)
+#         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 '''
@@ -78,7 +79,7 @@ class Images(APIView):
 @api_view(['DELETE'])
 def delete_images(request, Id):
     try:
-        update = Images.objects.get(id=Id)
+        update = image.objects.get(id=Id)
         update.is_deleted = True
         update.save()
         return Response(True)
@@ -95,14 +96,39 @@ def delete_images(request, Id):
 from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
-    image = Image.open(io.BytesIO(request.FILES.get('filename').read()))
+    # image = image.open(io.BytesIO(request.FILES.get('filename').read()))
 
-    img_instance = {
-        'pixels': image.tobytes(),
-        'size': image.size,
-        'mode': image.mode,
-    }
-    task = ai_task.delay(img_instance)
+    # img_instance = {
+    #     'pixels': image.tobytes(),
+    #     'size': image.size,
+    #     'mode': image.mode,
+    # }
+
+    #1. 이미지 테이블을 하나 만들어서 해당 이미지테이블의 uuid값을 가져오기 
+   
+    uuidValue = str(uuid.uuid4())
+    print("생성된 uuid : " + uuidValue)
+    image = images()
+    image.id = uuidValue
+    image.save()
+    print("테이블에 정상적으로 저장되었어요")
+
+
+    imageObjecct=images.object.all()
+    data = list(imageObjecct.values())
+    serializer = PhotoSerializer(imageObjecct, many=True)
+    print( JsonResponse(data))
+    # image = images()
+#         # image.origin_url = image_url
+#         # image.save()    
+    #2. 이미지를 받아서 특정 경로에 원하는 이름으로 저장하기 
+
+    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기
+
+    #4 . url값 이미지 테이블에 저장하기
+
+    #5.  task = ai_task.delay(uuid, filename)
+    task = ai_task.delay("asd")
     return JsonResponse({"task_id": task.id})
 
 
@@ -117,28 +143,21 @@ def get_task_result(request, user_id, task_id):
     if not task.ready():  # 작업이 완료되지 않았을 경우
         return JsonResponse({"ai_result": "Wait a minute please"})
 
+
+    #작업이 완료되면(즉 이미지가 생성되었다면) 값을 꺼내오기 (이미지를 지운다거나, 버킷에 올리거나 하는 일은 여기서 해선 안됨.
+    # 여기서 해야하는 일은 반복해도 괜찮은 일)
     ai_results = task.get("ai_results")
     image_url = task.get("image_url")
-
-    if ai_results['ai_results'] == 0:  # ai 결과가 없을 경우
+    
+    
+    if image_url == 0:  # ai 결과가 없을 경우
         return JsonResponse({"ai_result": "false"})
 
-    try:
-        Images.objects.get(image=image_url["image_url"])
-        return JsonResponse({"ai_result": "exist"})
-    except Images.DoesNotExist:
-        user_info = user.objects.get(id=user_id)
-        Images.objects.create(
-            image=image_url["image_url"], user_id=user_info)
 
-        image_info = Images.objects.get(
-            image=image_url["image_url"], user_id=user_info)
+    else :
+        return JsonResponse({'image_id': image_url})
 
-        return JsonResponse({'image_id': image_info.id})
-    except Exception as ex:
-        print(ex)
-        print("예외가 발생")
-        return Response(False)
+  
 
 
 '''
@@ -155,7 +174,7 @@ def get_history(request):
         # 토큰으로 받은 아이디
         user_id = request.POST['user_id']  # 임시로
 
-        image = Images.objects.filter(status="SUCCESS", is_deleted=False)
+        image = images.objects.filter(status="SUCCESS", is_deleted=False)
         serializer = PhotoSerializer(image, many=True)
 
         return JsonResponse({"data": serializer.data})

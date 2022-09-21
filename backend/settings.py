@@ -64,8 +64,8 @@ INSTALLED_APPS = [
 
     'django.contrib.sites',
 
-    'images',
     'users',
+     'images',
 
     #django-rest-auth
     'rest_framework',
@@ -82,6 +82,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    'drf_yasg',
 
     
 ]

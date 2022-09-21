@@ -1,5 +1,4 @@
 from email.mime import image
-import boto3 as boto3
 from PIL import Image
 from django.core.cache import cache
 from .models import images
@@ -21,6 +20,8 @@ from .models import *
 from django.core import serializers
 import json
 from django.core.files.storage import default_storage
+
+from .utils import *
 
 
 # class Images(APIView):
@@ -97,38 +98,29 @@ def delete_images(request, Id):
 from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
-    # image = image.open(io.BytesIO(request.FILES.get('filename').read()))
-
-    # img_instance = {
-    #     'pixels': image.tobytes(),
-    #     'size': image.size,
-    #     'mode': image.mode,
-    # }
-
-    #1. 이미지 테이블을 하나 만들어서 해당 이미지테이블의 uuid값을 가져오기 
-  
 
 
-    uuidValue = str(uuid.uuid4())
-    imageName = str(uuid.uuid4())
-
+    uuidValue = str(uuid.uuid4()) #고유한 폴더명
+    imageName = str(uuid.uuid4()) #고유한 이미지명
 
     file = request.FILES['filename'] 
-    path = default_storage.save('ai_image/'+uuidValue+'/'+imageName, file) #파일을 받아 저장
-  
+    default_storage.save('ai_image/'+uuidValue+'/'+imageName+".png", file) #파일을 받아 저장
+
+    image_url = uploadBucket('ai_image/'+uuidValue+'/'+imageName+'.png') #버킷 업로드
+    #향후 이미지의 정확한 파일명 알아낼 것
+
     image = images()
     image.id = uuidValue
+    image.origin_url = image_url
     image.save()
     print("테이블에 정상적으로 저장되었어요")
 
-    # image = images()
-#         # image.origin_url = image_url
-#         # image.save()    
+
     #2. 이미지를 받아서 특정 경로에 원하는 이름으로 저장하기 (O)
 
-    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기 (진행중)
+    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기 (O)
 
-    #4 . url값 이미지 테이블에 저장하기
+    #4 . url값 이미지 테이블에 저장하기 (O)
 
     #5.  task = ai_task.delay(uuid, filename)
     task = ai_task.delay("asd")

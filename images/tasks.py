@@ -12,7 +12,7 @@ from .utils import uploadBucket, deleteImage
 @app.task
 def ai_task(path, name):
    
-    ai_process(path,name)
+    ai_process(path)
     after_url = uploadBucket('ai_image/'+path+'/final_output/'+name+'.png') #버킷 업로드
     print("결과를 버킷에 업로드합니다.")
     

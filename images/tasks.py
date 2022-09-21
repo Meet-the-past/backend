@@ -6,7 +6,7 @@ from celery import shared_task
 from backend.celery import app
 
 from ai.photo_restoration.processAI import ai_process
-from .utils import uploadBucket
+from .utils import uploadBucket, deleteImage
 
 
 @app.task
@@ -24,6 +24,8 @@ def ai_task(path, name):
         
     except Exception as ex:
         print(ex)
-        
+    
+    deleteImage('ai_image/'+path)
+
     return {"uuid" :path}
 

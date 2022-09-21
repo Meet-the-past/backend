@@ -1,6 +1,9 @@
 import uuid
 import boto3 as boto3
+import os
+import shutil
 from backend.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+
 
 
 def uploadBucket(path):
@@ -18,3 +21,9 @@ def uploadBucket(path):
                 image_uuid + "." + image_type
     image_url = image_url.replace(" ", "/")
     return image_url
+
+
+
+def deleteImage(path):
+    if os.path.exists(path):  # 폴더내부의 이미지 삭제
+       shutil.rmtree(path)

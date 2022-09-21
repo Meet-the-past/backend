@@ -23,19 +23,8 @@ from django.core.files.storage import default_storage
 from .utils import *
 
 
-# class Images(APIView):
-#     def post(self, request, format=None):
-#         serializers = PhotoSerializer(data=request.data)
-#         if serializers.is_valid():
-#             serializers.save()
-#             return Response(serializers.data, status.HTTP_201_CREATED)
-#         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-'''
-//향후 유틸로 분리하여 코드 활용하기 (특정 이미지를 받으면 버킷에 저장)
--> 매개변수로 파일이 저장된 위치를 받고 return으로 해당 이미지가 저장된 url
-'''
 # @api_view(['POST']) 
 # def get_img_url(request):
 #     try:
@@ -92,62 +81,46 @@ def delete_images(request, Id):
 '''
  @ fuction get_task_id - 사용자가 이미지를 업로드하면 taskID반환
  @ param : FormData("filename") 
- @ ai_task.delay 함수에서 실제 AI코드 돌아감
+ @ update-date : 2022-09-22
 '''
 from .tasks import ai_task
+
 @api_view(['POST'])
 def get_task_id(request):
 
-
-    uuidValue = str(uuid.uuid4()) #고유한 폴더명
+    uuidKey = str(uuid.uuid4()) #고유한 폴더명
     imageName = str(uuid.uuid4()) #고유한 이미지명
 
     file = request.FILES['filename'] 
-    default_storage.save('ai_image/'+uuidValue+'/'+imageName+".png", file) #파일을 받아 저장
+    default_storage.save('ai_image/'+uuidKey+'/'+imageName+".png", file) #파일을 받아 저장
 
-    image_url = uploadBucket('ai_image/'+uuidValue+'/'+imageName+'.png') #버킷 업로드
-    #향후 이미지의 정확한 파일명 알아낼 것
+    image_url = uploadBucket('ai_image/'+uuidKey+'/'+imageName+'.png') #버킷 업로드
+  
 
     image = images()
-    image.id = uuidValue
+    image.id = uuidKey
     image.origin_url = image_url
     image.save()
-    print("테이블에 정상적으로 저장되었어요")
-
-
-    #2. 이미지를 받아서 특정 경로에 원하는 이름으로 저장하기 (O)
-
-    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기 (O)
-
-    #4 . url값 이미지 테이블에 저장하기 (O)
-
-    #5.  task = ai_task.delay(uuid, filename)
-    task = ai_task.delay(uuidValue,imageName)
+ 
+    task = ai_task.delay(uuidKey,imageName)
     return JsonResponse({"task_id": task.id})
 
 
 '''
  @ fuction get_task_result - taskId값을 받아 AI결과의 처리여부 확인 및 결과 url 반환
  @ param : taskId 
- @ 추가해야할 부분 : userId의 경우 토큰을 통해 식별하기때문에 유저확인을 위한 코드부분은 수정해야합니다.
+ @ update-date : 2022-09-22
 '''
 @api_view(['GET'])
 def get_task_result(request, task_id):
     task = AsyncResult(task_id)
     if not task.ready():  # 작업이 완료되지 않았을 경우
-        return JsonResponse({"ai_result": "Wait a minute please"})
+        return JsonResponse({"data": "RUNNING"})
 
-
-    #작업이 완료되면(즉 이미지가 생성되었다면) 값을 꺼내오기 (이미지를 지운다거나, 버킷에 올리거나 하는 일은 여기서 해선 안됨.
-    # 여기서 해야하는 일은 반복해도 괜찮은 일)
-    uuidValue = task.get()['uuid']
-    image = images.objects.get(id=uuidValue)
-    serializer = PhotoSerializer2(image)
+    uuidKey = task.get()['uuid']
+    image = images.objects.get(id=uuidKey)
+    serializer = PhotoResultSerializer(image)
     return JsonResponse({"data": serializer.data})
-  
-    
-
-
 
 '''
  @ fuction get_history - 사용자가 업로드한 이미지들을 반환

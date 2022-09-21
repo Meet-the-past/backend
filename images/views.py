@@ -20,6 +20,7 @@ from users.models import user
 from .models import *
 from django.core import serializers
 import json
+from django.core.files.storage import default_storage
 
 
 # class Images(APIView):
@@ -105,25 +106,27 @@ def get_task_id(request):
     # }
 
     #1. 이미지 테이블을 하나 만들어서 해당 이미지테이블의 uuid값을 가져오기 
-   
+  
+
+
     uuidValue = str(uuid.uuid4())
-    print("생성된 uuid : " + uuidValue)
+    imageName = str(uuid.uuid4())
+
+
+    file = request.FILES['filename'] 
+    path = default_storage.save('ai_image/'+uuidValue+'/'+imageName, file) #파일을 받아 저장
+  
     image = images()
     image.id = uuidValue
     image.save()
     print("테이블에 정상적으로 저장되었어요")
 
-
-    imageObjecct=images.object.all()
-    data = list(imageObjecct.values())
-    serializer = PhotoSerializer(imageObjecct, many=True)
-    print( JsonResponse(data))
     # image = images()
 #         # image.origin_url = image_url
 #         # image.save()    
-    #2. 이미지를 받아서 특정 경로에 원하는 이름으로 저장하기 
+    #2. 이미지를 받아서 특정 경로에 원하는 이름으로 저장하기 (O)
 
-    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기
+    #3. 해당 경로로부터 이미지를 버킷에 올리고 Url받아오기 (진행중)
 
     #4 . url값 이미지 테이블에 저장하기
 

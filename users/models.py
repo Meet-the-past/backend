@@ -8,7 +8,7 @@ from .managers import CustomUserManager
 
 
 class user(models.Model): # 상속 클래스 내용으로 인한 error
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)  # PK
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)  # PK
     name = models.CharField(max_length=200, null=False)
     email = models.CharField(max_length=50)
     # email = models.EmailField(_('email address'), unique=False)

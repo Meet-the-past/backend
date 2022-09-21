@@ -23,40 +23,55 @@ from django.core.files.storage import default_storage
 from .utils import *
 
 
+'''
+//향후 유틸로 분리하여 코드 활용하기 (특정 이미지를 받으면 버킷에 저장)
+-> 매개변수로 파일이 저장된 위치를 받고 return으로 해당 이미지가 저장된 url
+'''
+@api_view(['POST']) 
+def get_img_url(request):
+    try:
+        payload = user_token_to_data(request.headers.get('Authorization', None))
+        print(payload['id'])
+        
+        #b=user.objects.filter(user_id=payload.get('id')).user_id
+        if(user.objects.filter(user_id=payload['id'])):
+        
+            image = request.FILES['origin_url']
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=AWS_SECRET_ACCESS_KEY
+            )
+            image_type = "jpg"
+            image_uuid = str(uuid.uuid4())
+            s3_client.put_object(Body=image, Bucket='meet-the-past', Key=image_uuid + "." + image_type)
+            image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
+                        image_uuid + "." + image_type
+            image_url = image_url.replace(" ", "/")
+            ##이미 존재하는 user_id에 orgin_url 과 status를 업데이트 하는 방식으로 해야되는가?
+            
+            #Images.objects.create(origin_url = image_url, status = 'SUCCESS')
+            print("a")
+            a=Images.objects.create(origin_url = image_url, status = 'SUCCESS', user_id=payload['id'])
+            return Response(True)
+            
 
+        else:
+            return Response("falsee")
+                                #f'{image_url}'
+                                #user_id = 1,##이부분 나중에 바꿔야 함
+                                #status
 
-# @api_view(['POST']) 
-# def get_img_url(request):
-#     try:
+            # image = images()
+            # image.origin_url = image_url
+            # image.save()
+        return Response("fasle")
+          
 
-#         image = request.FILES['origin_url']
-#         s3_client = boto3.client(
-#             's3',
-#             aws_access_key_id=AWS_ACCESS_KEY_ID,
-#             aws_secret_access_key=AWS_SECRET_ACCESS_KEY
-#         )
-#         image_type = "jpg"
-#         image_uuid = str(uuid.uuid4())
-#         s3_client.put_object(Body=image, Bucket='meet-the-past', Key=image_uuid + "." + image_type)
-#         image_url = "http://meet-the-past.s3.ap-northeast-2.amazonaws.com/" + \
-#                     image_uuid + "." + image_type
-#         image_url = image_url.replace(" ", "/")
-#         print(image_url)
-#         Images.objects.create(origin_url = image_url,status = 'SUCCESS')
-#                             #f'{image_url}'
-#                             #user_id = 1,##이부분 나중에 바꿔야 함
-#                             #status
-
-#         # image = images()
-#         # image.origin_url = image_url
-#         # image.save()
-
-#         return Response(True)
-
-#     except Exception as ex:
-#         print(ex)
-#         print("예외가 발생")
-#         return Response(False)
+    except Exception as ex:
+        print(ex)
+        print("예외가 발생")
+        return Response(False)
 
 
 '''
@@ -68,14 +83,18 @@ from .utils import *
 
 @api_view(['DELETE'])
 def delete_images(request, Id):
-    try:
-        update = image.objects.get(id=Id)
-        update.is_deleted = True
-        update.save()
-        return Response(True)
-    except Exception as ex:
-        print(ex)
-        return Response(False)
+    payload = user_token_to_data(request.headers.get('Authorization', None))
+    if (Images.objects.filter(user_id=payload.get('id'))):
+        try:
+            update = Images.objects.get(id=Id)
+            update.is_deleted = True
+            update.save()
+            return Response(True)
+        except Exception as ex:
+            print(ex)
+            return Response(False)
+    # 유효한 토큰인지 확인하느 ㄴ코드추가
+    
 
 
 '''
@@ -130,34 +149,17 @@ def get_task_result(request, task_id):
 '''
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 def get_history(request):
     try:
-        # 토큰으로 받은 아이디
-        user_id = request.POST['user_id']  # 임시로
+    
+        #토큰으로 받은 아이디
+        payload = user_token_to_data(request.headers.get('Authorization', None))
+        image= Images.objects.filter(user_id=payload.get('id'),is_deleted=False)
 
-        image = images.objects.filter(status="SUCCESS", is_deleted=False)
         serializer = PhotoSerializer(image, many=True)
-
         return JsonResponse({"data": serializer.data})
-
     except Exception as ex:
         print(ex)
         print("예외가 발생")
         return Response(False)
-
-# 실제 코드
-# @api_view(['GET'])
-# def get_history(request):
-#     try:
-
-#         #토큰으로 받은 아이디
-
-#         image=images.objects.filter(user_id = "token으로 받은 값" ,is_deleted=False)
-#         serializer=imagesSerializer(image, many=True)
-#         return Response(serializer.data)
-
-#     except Exception as ex:
-#         print(ex)
-#         print("예외가 발생")
-#         return Response(False)

@@ -5,7 +5,8 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view
 from datetime import datetime, timedelta
-from .serializers import UserSignupResponse
+from .serializers import UserSignupResponse, CustomRegisterSerializer, AccountLoginSerializer, \
+    CheckDuplicationSerializer
 
 # 누구나 접근 가능 (회원가입 , 아이디 중복시 Error 반환하도록 설계 필요)
 from .utils import *
@@ -14,15 +15,7 @@ from .utils import *
 @swagger_auto_schema(
     method='post',
     operation_summary='''사용자 회원가입''',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'name': openapi.Schema('사용자 이름', type=openapi.TYPE_STRING),
-            'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
-            'password': openapi.Schema('사용자 패스워드', type=openapi.TYPE_STRING),
-        },
-        required=['name','email','password']  # 필수값을 지정 할 Schema를 입력해주면 된다.
-        ),
+    request_body=CustomRegisterSerializer,
     responses={
         201: openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -48,14 +41,7 @@ def user_sign_up(request):
 @swagger_auto_schema(
     method='post',
     operation_summary='''사용자 로그인''',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'input_email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
-            'input_password': openapi.Schema('사용자 패스워드', type=openapi.TYPE_STRING),
-        },
-        required=['email','password']  # 필수값을 지정 할 Schema를 입력해주면 된다.
-    ),
+    request_body=AccountLoginSerializer,
     responses={
         200: openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -92,27 +78,8 @@ def login(request):
 @swagger_auto_schema(
     method='post',
     operation_summary='''ID duplication check''',
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            'email': openapi.Schema('사용자 이메일', type=openapi.TYPE_STRING),
-        },
-        required=['email']  # 필수값을 지정 할 Schema를 입력해주면 된다.
-    ),
-    responses={
-        200: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'message': openapi.Schema('New email', type=openapi.TYPE_STRING),
-            }
-        ),
-        401: openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'message': openapi.Schema('Duplicated email', type=openapi.TYPE_STRING),
-            }
-        )
-    }
+    request_body=CheckDuplicationSerializer,
+    responses={200: 'You can use this email'}
 )
 @api_view(['POST'])
 def user_is_duplicate(request):

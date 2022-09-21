@@ -2,6 +2,8 @@ from email.mime import image
 from PIL import Image
 from django.core.cache import cache
 from .models import images
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import *
@@ -78,7 +80,12 @@ def get_img_url(request):
  
 '''
 
-
+@swagger_auto_schema(
+    method='delete',
+    operation_summary='''이미지 삭제''',
+    request_body=PhotoSerializer,
+    responses={200: 'delete successfully'}
+)
 @api_view(['DELETE'])
 def delete_images(request, Id):
     payload = user_token_to_data(request.headers.get('Authorization', None))
@@ -100,8 +107,7 @@ def delete_images(request, Id):
  @ param : FormData("filename") 
  @ update-date : 2022-09-22
 '''
-from .tasks import ai_task
-
+# from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
     
@@ -138,6 +144,12 @@ def get_task_id(request):
  @ param : taskId 
  @ update-date : 2022-09-22
 '''
+@swagger_auto_schema(
+    method='get',
+    operation_summary='''이미지 불러오기''',
+    request_body=PhotoSerializer,
+    responses={200: 'get result successfully'}
+)
 @api_view(['GET'])
 def get_task_result(request, task_id):
 
@@ -160,6 +172,12 @@ def get_task_result(request, task_id):
 
 '''
 
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''이미지 히스토리''',
+    request_body=PhotoSerializer,
+    responses={200: 'get history result successfully'}
+)
 
 @api_view(['GET'])
 def get_history(request):

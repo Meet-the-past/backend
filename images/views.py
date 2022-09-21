@@ -11,7 +11,6 @@ from backend.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
-import io
 from celery.result import AsyncResult
 
 from users.models import user
@@ -123,7 +122,7 @@ def get_task_id(request):
     #4 . url값 이미지 테이블에 저장하기 (O)
 
     #5.  task = ai_task.delay(uuid, filename)
-    task = ai_task.delay("asd")
+    task = ai_task.delay(uuidValue,imageName)
     return JsonResponse({"task_id": task.id})
 
 

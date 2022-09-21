@@ -22,12 +22,12 @@ def ai_process(uuid, imageName):
   processed_url을 꺼내 프론트로 보낸다
    '''
    #call("cd /backend/ai/photo_restoration/")
-   UUID = "100" #매개변수로 받아올 파일의 uuid (지금은 임시로 고정값 넣음)
-   TEMPIMAGENAME = "tempImageName" #매개변수로 받아오는 imageNAME
+   UUID =  uuid
+   TEMPIMAGENAME = imageName
 
 
-   inputImagePath =   "./inputImage/" + UUID   #여기만 media파일로 바꾸먼됨
-   outputImagePath =  "./outputImage/" + UUID #여기도 마찬가지
+   inputImagePath =   "ai_image/" + UUID   
+   outputImagePath =  "ai_image/" + UUID 
 
  
    if not os.path.exists(inputImagePath):  #입력 이미지 폴더 생성예시 (실제로는 앞의 api에서 이미 이미지를 특정폴더에 저장)

@@ -21,13 +21,13 @@ def ai_process(uuid, imageName):
 	결과 값으로 uuid를 념겨서 (이미지 객체의 기본키) , DB에서 해당 uuid값을 가지고 origin_url
   processed_url을 꺼내 프론트로 보낸다
    '''
- 
+   #call("cd /backend/ai/photo_restoration/")
    UUID = "100" #매개변수로 받아올 파일의 uuid (지금은 임시로 고정값 넣음)
    TEMPIMAGENAME = "tempImageName" #매개변수로 받아오는 imageNAME
 
 
-   inputImagePath =   "./inputImage/" + UUID  
-   outputImagePath =  "./outputImage/" + UUID
+   inputImagePath =   "./inputImage/" + UUID   #여기만 media파일로 바꾸먼됨
+   outputImagePath =  "./outputImage/" + UUID #여기도 마찬가지
 
  
    if not os.path.exists(inputImagePath):  #입력 이미지 폴더 생성예시 (실제로는 앞의 api에서 이미 이미지를 특정폴더에 저장)
@@ -36,8 +36,7 @@ def ai_process(uuid, imageName):
    f = open(inputImagePath+"/"+TEMPIMAGENAME+".png", 'w')  #실제로는 사용자가 api로 요청한 이미지를 해당 경로에 저장해야하지만 테스트용으로 따로 만든 코드
    f.close()
 
-   print(call( f"pwd"))
-   call( f"python run.py --input_folder {inputImagePath} --output_folder {outputImagePath}", shell=True)
+   call( f"python /backend/ai/photo_restoration/run.py --input_folder {inputImagePath} --output_folder {outputImagePath}", shell=True)
    # call("python run.py --input_folder ./test_images/old --output_folder ./output/ --GPU -1 --with_scratch") (실제 돌리는 명령어)
 
 

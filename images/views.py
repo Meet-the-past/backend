@@ -19,7 +19,7 @@ from .models import *
 from django.core import serializers
 import json
 from django.core.files.storage import default_storage
-
+from users.utils import *
 from .utils import *
 
 
@@ -50,7 +50,7 @@ def get_img_url(request):
             ##이미 존재하는 user_id에 orgin_url 과 status를 업데이트 하는 방식으로 해야되는가?
             
             
-            Images.objects.create(origin_url = image_url, status = 'SUCCESS', user_id=user.objects.get(user_id=payload['id']))
+            images.objects.create(origin_url = image_url, status = 'SUCCESS', user_id=user.objects.get(user_id=payload['id']))
             return Response(image_url)
             
 
@@ -82,9 +82,9 @@ def get_img_url(request):
 @api_view(['DELETE'])
 def delete_images(request, Id):
     payload = user_token_to_data(request.headers.get('Authorization', None))
-    if (Images.objects.filter(user_id=payload.get('id'))):
+    if (images.objects.filter(user_id=payload.get('id'))):
         try:
-            update = Images.objects.get(id=Id)
+            update = images.objects.get(id=Id)
             update.is_deleted = True
             update.save()
             return Response(True)
@@ -104,23 +104,33 @@ from .tasks import ai_task
 
 @api_view(['POST'])
 def get_task_id(request):
+    
 
-    uuidKey = str(uuid.uuid4()) #고유한 폴더명
-    imageName = str(uuid.uuid4()) #고유한 이미지명
+    payload = user_token_to_data(request.headers.get('Authorization', None))
+    
+    if(user.objects.filter(user_id=payload['id'])):
+        uuidKey = str(uuid.uuid4()) #고유한 폴더명
+        imageName = str(uuid.uuid4()) #고유한 이미지명
 
-    file = request.FILES['filename'] 
-    default_storage.save('ai_image/'+uuidKey+'/'+imageName+".png", file) #파일을 받아 저장
+        file = request.FILES['filename'] 
+        default_storage.save('ai_image/'+uuidKey+'/'+imageName+".png", file) #파일을 받아 저장
 
-    image_url = uploadBucket('ai_image/'+uuidKey+'/'+imageName+'.png') #버킷 업로드
-  
+        image_url = uploadBucket('ai_image/'+uuidKey+'/'+imageName+'.png') #버킷 업로드
+    
 
-    image = images()
-    image.id = uuidKey
-    image.origin_url = image_url
-    image.save()
- 
-    task = ai_task.delay(uuidKey,imageName)
-    return JsonResponse({"task_id": task.id})
+        image = images()
+        image.id = uuidKey
+        image.user_id=user.objects.get(user_id=payload['id'])
+        image.origin_url = image_url
+        image.status = 'SUCCESS'
+        image.save()
+    
+        task = ai_task.delay(uuidKey,imageName)
+        return JsonResponse({"task_id": task.id})
+
+    return JsonResponse({"data": "error"})
+
+    
 
 
 '''
@@ -153,7 +163,7 @@ def get_history(request):
         payload = user_token_to_data(request.headers.get('Authorization', None))
 
         if(user.objects.filter(user_id=payload['id'])):
-            image= Images.objects.filter(user_id=payload.get('id'),is_deleted=False)
+            image= images.objects.filter(user_id=payload.get('id'),is_deleted=False)
             serializer = PhotoSerializer(image, many=True)
             return JsonResponse({"data": serializer.data})
 

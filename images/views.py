@@ -140,13 +140,17 @@ def get_task_id(request):
 '''
 @api_view(['GET'])
 def get_task_result(request, task_id):
-    task = AsyncResult(task_id)
-    if not task.ready():  # 작업이 완료되지 않았을 경우
-        return JsonResponse({"data": "RUNNING"})
 
-    uuidKey = task.get()['uuid']
-    image = images.objects.get(id=uuidKey)
-    serializer = PhotoResultSerializer(image)
+    payload = user_token_to_data(request.headers.get('Authorization', None))
+    if(user.objects.filter(user_id=payload['id'])):
+        task = AsyncResult(task_id)
+        if not task.ready():  # 작업이 완료되지 않았을 경우
+            return JsonResponse({"data": "RUNNING"})
+
+        uuidKey = task.get()['uuid']
+        image = images.objects.get(id=uuidKey)
+        serializer = PhotoResultSerializer(image)
+        return JsonResponse({"data": serializer.data})
     return JsonResponse({"data": serializer.data})
 
 '''

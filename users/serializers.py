@@ -13,10 +13,15 @@ JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
 # User = get_user_model()
 
 # 회원가입
-class AccountRegisterSerializer(serializers.ModelSerializer):
+class AccountLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = user
-        fields = ['email', 'name', 'password']
+        fields = ['email', 'password']
+
+class CheckDuplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = user
+        fields = ['email']
 
 
 # 회원가입

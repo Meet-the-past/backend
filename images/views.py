@@ -107,7 +107,7 @@ def delete_images(request, Id):
  @ param : FormData("filename") 
  @ update-date : 2022-09-22
 '''
-# from .tasks import ai_task
+from .tasks import ai_task
 @api_view(['POST'])
 def get_task_id(request):
     
@@ -173,12 +173,11 @@ def get_task_result(request, task_id):
 '''
 
 @swagger_auto_schema(
-    method='post',
+    method='get',
     operation_summary='''이미지 히스토리''',
     request_body=PhotoSerializer,
     responses={200: 'get history result successfully'}
 )
-
 @api_view(['GET'])
 def get_history(request):
     try:

@@ -31,11 +31,10 @@ from .utils import *
 def get_img_url(request):
     try:
         payload = user_token_to_data(request.headers.get('Authorization', None))
-        print(payload['id'])
-        
-        #b=user.objects.filter(user_id=payload.get('id')).user_id
+        print(payload)
+
         if(user.objects.filter(user_id=payload['id'])):
-        
+
             image = request.FILES['origin_url']
             s3_client = boto3.client(
                 's3',
@@ -50,14 +49,13 @@ def get_img_url(request):
             image_url = image_url.replace(" ", "/")
             ##이미 존재하는 user_id에 orgin_url 과 status를 업데이트 하는 방식으로 해야되는가?
             
-            #Images.objects.create(origin_url = image_url, status = 'SUCCESS')
-            print("a")
-            a=Images.objects.create(origin_url = image_url, status = 'SUCCESS', user_id=payload['id'])
-            return Response(True)
+            
+            Images.objects.create(origin_url = image_url, status = 'SUCCESS', user_id=user.objects.get(user_id=payload['id']))
+            return Response(image_url)
             
 
         else:
-            return Response("falsee")
+            return Response("no vaild token")
                                 #f'{image_url}'
                                 #user_id = 1,##이부분 나중에 바꿔야 함
                                 #status
@@ -65,7 +63,7 @@ def get_img_url(request):
             # image = images()
             # image.origin_url = image_url
             # image.save()
-        return Response("fasle")
+        return Response(False)
           
 
     except Exception as ex:
@@ -152,13 +150,13 @@ def get_task_result(request, task_id):
 @api_view(['GET'])
 def get_history(request):
     try:
-    
-        #토큰으로 받은 아이디
         payload = user_token_to_data(request.headers.get('Authorization', None))
-        image= Images.objects.filter(user_id=payload.get('id'),is_deleted=False)
 
-        serializer = PhotoSerializer(image, many=True)
-        return JsonResponse({"data": serializer.data})
+        if(user.objects.filter(user_id=payload['id'])):
+            image= Images.objects.filter(user_id=payload.get('id'),is_deleted=False)
+            serializer = PhotoSerializer(image, many=True)
+            return JsonResponse({"data": serializer.data})
+
     except Exception as ex:
         print(ex)
         print("예외가 발생")

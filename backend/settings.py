@@ -67,25 +67,21 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'users',
-     'images',
+    'images',
 
     # 'django-rest-auth',
     'rest_framework',
-     'corsheaders', #CorsError
+    'drf_yasg',
+    'corsheaders', #CorsError
     'storages',
     'django_celery_beat',
     'django_celery_results',
-    # 'rest_framework_simplejwt.token_blacklist',
-    # 'rest_framework.authtoken',
-    # 'dj_rest_auth',
-    # 'dj_rest_auth.registration',
 
-    #django-allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 
-    'drf_yasg',
+ 
 
     
 ]

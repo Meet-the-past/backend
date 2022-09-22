@@ -1,4 +1,5 @@
 from email.mime import image
+from urllib import request
 from PIL import Image
 from django.core.cache import cache
 from .models import images
@@ -83,8 +84,6 @@ def get_img_url(request):
 @swagger_auto_schema(
     method='delete',
     operation_summary='''이미지 삭제''',
-    request_body=PhotoSerializer,
-    responses={200: 'delete successfully'}
 )
 @api_view(['DELETE'])
 def delete_images(request, Id):
@@ -107,7 +106,21 @@ def delete_images(request, Id):
  @ param : FormData("filename") 
  @ update-date : 2022-09-22
 '''
+
 from .tasks import ai_task
+@swagger_auto_schema(
+    method='post',
+    operation_summary='''이미지 업로드''',
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'token': openapi.Schema('사용자 token', type=openapi.TYPE_STRING),
+            'filename' : openapi.Schema('이미지', type=openapi.IN_FORM),
+        },
+        required=['token']  # 필수값을 지정 할 Schema를 입력해주면 된다.
+    ),
+    responses={200: TaskIdSerializer}
+)
 @api_view(['POST'])
 def get_task_id(request):
     
@@ -146,9 +159,8 @@ def get_task_id(request):
 '''
 @swagger_auto_schema(
     method='get',
-    operation_summary='''이미지 불러오기''',
-    request_body=PhotoSerializer,
-    responses={200: 'get result successfully'}
+    operation_summary='''처리된 AI결과 받아오기''',
+    responses={200: PhotoResultSerializer}
 )
 @api_view(['GET'])
 def get_task_result(request, task_id):
@@ -171,11 +183,9 @@ def get_task_result(request, task_id):
  @향후 로그인 기능이 구현되면 헤더에서 받은 토큰을 이용해서 userId값 받을 것(실제 코드 부분 참고)
 
 '''
-
 @swagger_auto_schema(
     method='get',
     operation_summary='''이미지 히스토리''',
-    request_body=PhotoSerializer,
     responses={200: 'get history result successfully'}
 )
 @api_view(['GET'])

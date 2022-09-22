@@ -50,7 +50,7 @@ def login(request):
     input_password = request.data['password']
     access_token = None
     refresh_token = None
-
+    #비밀번호 예외처리
     if input_password and input_email:
         user_data = user_find_by_email(input_email).first()
         if user_data:

@@ -81,8 +81,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
 
- 
-
+    'django_prometheus',
     
 ]
 
@@ -96,7 +95,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -191,6 +192,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = int(1e10)
 CACHES = {
     'default': {
         "BACKEND": "django_redis.cache.RedisCache",
+        # 'BACKEND': 'django_prometheus.cache.backends.filebased.FileBasedCache',
         'LOCATION': 'redis://redis:6379',
     }
 }

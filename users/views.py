@@ -38,9 +38,12 @@ def user_sign_up(request):
     password = request.data['password']
     email = request.data['email']
 
-    new_user = user_create_client(name, email, password)
-    data = UserSignupResponse(new_user, many=False).data
-    return JsonResponse(data, status=201)
+    if (not UserDuplicateCheck().email(email)):
+        new_user = user_create_client(name, email, password)
+        data = UserSignupResponse(new_user, many=False).data
+        return JsonResponse(data, status=201)
+    else:
+        return JsonResponse({"message": "DupicatedEmail"}, status=401)
 
 
 # Login
@@ -78,7 +81,7 @@ def user_is_duplicate(request):
     return JsonResponse({"result": "New email"}, status=200)
 
 
-# refreshtoken 재발급
+# accesstoken 재발급
 @api_view(['POST'])
 def user_reissuance_access_token(request):
     token = request.headers.get('Authorization', None)

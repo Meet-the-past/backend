@@ -37,3 +37,9 @@ django-redis
 bcrypt
 
 django-environ
+
+django-prometheus==2.2.0
+# prometheus-client==0.9.0
+django-prometheus-metrics==0.0.1
+prometheus-client>=0.12.0
+# pip-prometheus>=1.2.1

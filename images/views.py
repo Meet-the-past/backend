@@ -24,7 +24,6 @@ import json
 from django.core.files.storage import default_storage
 from users.utils import *
 from .utils import *
-from backend.users.utils import *
 
 
 '''

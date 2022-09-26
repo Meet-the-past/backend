@@ -131,7 +131,8 @@ def user_reissuance_access_token(request):
         if payload.get('type') == 'refresh_token':
             access_token = user_refresh_to_access(token)
             return JsonResponse({"accessToken": access_token,
-                                 "expiredTime": datetime.utcnow() + timedelta(minutes=7)}, status=200)
+                                 "expiredTime": datetime.utcnow() + timedelta(days=7)}, status=200)
+
         else:
             return JsonResponse({"message": "Not refresh_token"}, status=401)
     else:

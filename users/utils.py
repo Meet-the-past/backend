@@ -23,6 +23,7 @@ def user_refresh_to_access(refresh_token):
         access_token = jwt.encode(
             {'id': payload.get('id')
                 , 'type': "access_token", 'exp': datetime.utcnow() + timedelta(days=7)
+
              }, SECRET_KEY, ALGORITHM).decode('utf-8')
     except jwt.exceptions.ExpiredSignatureError or jwt.exceptions.DecodeError:
         return False
@@ -32,12 +33,14 @@ def user_refresh_to_access(refresh_token):
 def user_generate_access_token(user_data):
     return jwt.encode(
         {'id': str(user_data.user_id), 'type': 'access_token', 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY,
+
         ALGORITHM).decode('utf-8')
 
 
 def user_generate_refresh_token(user_data):
     return jwt.encode(
-        {'id': str(user_data.user_id), 'type': "refresh_token", 'exp': datetime.utcnow() + timedelta(days=30)}, SECRET_KEY,
+
+        {'id': str(user_data.user_id), 'type': "refresh_token", 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY,
         ALGORITHM).decode('utf-8')
 
 

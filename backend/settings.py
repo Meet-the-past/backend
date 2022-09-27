@@ -211,3 +211,7 @@ CELERY_BEAT_SCHEDULE = {
         # 'args': (4, 4)
     }
 }
+REST_FRAMEWORK = {
+ 
+    'EXCEPTION_HANDLER': 'backend.api_exception.custom_exception_handler'
+}

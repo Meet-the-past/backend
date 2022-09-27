@@ -8,13 +8,10 @@ from .models import user
 
 
 def user_token_to_data(token):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-    except jwt.exceptions.ExpiredSignatureError:
-        return "Expired_Token"
-    except jwt.exceptions.DecodeError:
-        return "Invalid_Token"
+    payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
     return payload
+
+
 
 
 def user_refresh_to_access(refresh_token):

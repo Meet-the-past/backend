@@ -21,8 +21,9 @@ def user_refresh_to_access(refresh_token):
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=ALGORITHM)
         access_token = jwt.encode(
-            {'id': payload.get('user_id'),
-             'email': payload.get('email'), 'type': "access_token",
+            {'id': payload.get('id')
+                , 'type': "access_token", 'exp': datetime.utcnow() + timedelta(days=7)
+
              }, SECRET_KEY, ALGORITHM).decode('utf-8')
     except jwt.exceptions.ExpiredSignatureError or jwt.exceptions.DecodeError:
         return False
@@ -31,12 +32,14 @@ def user_refresh_to_access(refresh_token):
 
 def user_generate_access_token(user_data):
     return jwt.encode(
-        {'id': str(user_data.user_id), 'type': 'access_token', 'exp': datetime.utcnow() + timedelta(minutes=30)}, SECRET_KEY,
+        {'id': str(user_data.user_id), 'type': 'access_token', 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY,
+
         ALGORITHM).decode('utf-8')
 
 
 def user_generate_refresh_token(user_data):
     return jwt.encode(
+
         {'id': str(user_data.user_id), 'type': "refresh_token", 'exp': datetime.utcnow() + timedelta(days=7)}, SECRET_KEY,
         ALGORITHM).decode('utf-8')
 
@@ -75,7 +78,7 @@ def user_change_value(value, alias):
     if value.get('password'):
         hash_password, salt = user_hash_password(value.get('password'))
         user_data.password = hash_password
-        user_data.salt = salt
+        user_data.salt = salt.tobytes()
         # value.update({"password": hash_password, "salt": salt})
     elif value.get('alias'):
         user_data.alias = value.get('alias')

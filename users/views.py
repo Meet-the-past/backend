@@ -32,9 +32,12 @@ def user_sign_up(request):
     email = request.data['email']
     password = request.data['password']
 
-    new_user = user_create_client(name, email, password)
-    data = UserSignupResponse(new_user, many=False).data
-    return JsonResponse(data, status=201)
+    if (not UserDuplicateCheck().email(email)):
+        new_user = user_create_client(name, email, password)
+        data = UserSignupResponse(new_user, many=False).data
+        return JsonResponse(data, status=201)
+    else:
+        return JsonResponse({"message": "DupicatedEmail"}, status=401)
 
 
 # Login
@@ -69,7 +72,7 @@ def login(request):
             return JsonResponse({"message": "invalid_data"}, status=400)
 
     data = {"accessToken": access_token, "refreshToken": refresh_token,
-            "expiredTime": datetime.utcnow() + timedelta(minutes=30),
+            "expiredTime": datetime.utcnow() + timedelta(days=7),
             "email": user_data.email}
 
     return JsonResponse({"result": data}, status=200)
@@ -91,6 +94,7 @@ def user_is_duplicate(request):
     return JsonResponse({"result": "New email"}, status=200)
 
 
+# accesstoken 재발급
 @swagger_auto_schema(
     method='post',
     operation_summary='''refreshtoken 재발급''',
@@ -127,7 +131,8 @@ def user_reissuance_access_token(request):
         if payload.get('type') == 'refresh_token':
             access_token = user_refresh_to_access(token)
             return JsonResponse({"accessToken": access_token,
-                                 "expiredTime": datetime.utcnow() + timedelta(minutes=30)}, status=200)
+                                 "expiredTime": datetime.utcnow() + timedelta(days=7)}, status=200)
+
         else:
             return JsonResponse({"message": "Not refresh_token"}, status=401)
     else:
